@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "140434318989",
+    "project_id": "react-native-callkit",
+    "storage_bucket": "react-native-callkit.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "XXXX",
+        "android_client_info": {
+          "package_name": "com.call.trigger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "XXXX.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "XXXX"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "XXXX.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
