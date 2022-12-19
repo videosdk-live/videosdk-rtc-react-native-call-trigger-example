@@ -2,8 +2,8 @@ const API_BASE_URL = "https://api.videosdk.live/v2";
 const VIDEOSDK_TOKEN = process.env.REACT_APP_VIDEOSDK_TOKEN;
 const FCM_SERVER_URL = "http://192.168.1.10:9000";
 
-export const getToken = async () => {
-  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiI5N2FmNjg0NC02ZjM5LTRjMDMtYmQ4Ny0xNGQ5MzJhMTAwZDUiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTY3MTIwMDYzMiwiZXhwIjoxODI4OTg4NjMyfQ.XrfFFeLYnylCQZbOzlyzsvDDrzjAx_SaBNVY_Q4W4D0";
+export const getToken = () => {
+  return VIDEOSDK_TOKEN;
 };
 
 export const createMeeting = async ({ token }) => {

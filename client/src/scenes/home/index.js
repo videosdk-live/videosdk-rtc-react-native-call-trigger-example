@@ -47,7 +47,7 @@ export default function Home({ navigation }) {
     }
 
     async function getTokenAndMeetingId() {
-      const videoSDKtoken = await getToken();
+      const videoSDKtoken = getToken();
       const videoSDKMeetingId = await createMeeting({ token: videoSDKtoken });
       setVideosdkToken(videoSDKtoken);
       setVideosdkMeeting(videoSDKMeetingId);
@@ -84,7 +84,7 @@ export default function Home({ navigation }) {
 
           Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
           Incomingvideocall.displayIncomingCall(callerName);
-          
+
           break;
         case "ACCEPTED":
           setisCalling(false);
