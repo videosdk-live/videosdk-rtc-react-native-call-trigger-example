@@ -94,7 +94,9 @@ Add Local server ip address in `client/api/api.js` file.
 const FCM_SERVER_URL = "http://192.168.1.10:9000"
 ```
 
-If you face any issue you can generate it on [Github](https://github.com/videosdk-live/videosdk-rtc-react-native-call-trigger-example/issues) or ping us on [Discord](https://discord.gg/bsEukaNhrD)
+## Issue 
+
+You can generate the issue on [Github](https://github.com/videosdk-live/videosdk-rtc-react-native-call-trigger-example/issues) or ping us on [Discord](https://discord.gg/bsEukaNhrD)
 
 ## Testing 
 
