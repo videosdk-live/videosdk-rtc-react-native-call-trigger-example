@@ -98,14 +98,14 @@ const FCM_SERVER_URL = "http://192.168.1.10:9000"
 
 You can generate the issue on [Github](https://github.com/videosdk-live/videosdk-rtc-react-native-call-trigger-example/issues) or ping us on [Discord](https://discord.gg/bsEukaNhrD)
 
-## Testing 
+## Other Information 
 
-### Devices 
+### Tested on Devices 
 - Samsung 
 - Xiomi 
 - Realme
 - Oppo 
 
-### Testing 
+### Upcoming Feature 
 - Recieves call when app is background 
 - Recieves call when lock screen - _COMING SOON_
