@@ -5,9 +5,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { SCREEN_NAMES } from "./src/navigators/screenNames";
 import Meeting from "./src/scenes/meeting";
 import { LogBox, Text, Alert } from "react-native";
-import RNCallKeep from "react-native-callkeep";
 import Home from "./src/scenes/home";
 import OverlayPermissionModule from "videosdk-rn-android-overlay-permission";
+import IncomingVideoCall from "./src/utils/incoming-video-call";
 LogBox.ignoreLogs(["Warning: ..."]);
 LogBox.ignoreAllLogs();
 
@@ -52,29 +52,10 @@ export default function App() {
       }
     }, 3000);
   }, []);
-  useEffect(() => {
-    const options = {
-      ios: {
-        appName: "VideoSDK",
-      },
-      android: {
-        alertTitle: "Permissions required",
-        alertDescription:
-          "This application needs to access your phone accounts",
-        cancelButton: "Cancel",
-        okButton: "ok",
-        imageName: "phone_account_icon",
-        foregroundService: {
-          channelId: "com.company.my",
-          channelName: "Foreground service for my app",
-          notificationTitle: "My app is running on background",
-          notificationIcon: "Path to the resource icon of the notification",
-        },
-      },
-    };
 
-    RNCallKeep.setup(options);
-    RNCallKeep.setAvailable(true);
+  useEffect(() => {
+    IncomingVideoCall.setupCallKeep();
+    IncomingVideoCall.setupEventListeners();
   }, []);
 
   return (

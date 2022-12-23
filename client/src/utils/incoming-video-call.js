@@ -1,5 +1,7 @@
+import { Platform } from "react-native";
 import RNCallKeep from "react-native-callkeep";
 import uuid from "react-native-uuid";
+import VoipPushNotification from "react-native-voip-push-notification";
 
 class IncomingCall {
   constructor() {
@@ -8,7 +10,24 @@ class IncomingCall {
 
   configure = (incomingcallAnswer, endIncomingCall) => {
     try {
+      this.setupCallKeep();
+      Platform.OS === "android" && RNCallKeep.setAvailable(true);
+      RNCallKeep.addEventListener("answerCall", incomingcallAnswer);
+      RNCallKeep.addEventListener("endCall", endIncomingCall);
+    } catch (error) {
+      console.error("initializeCallKeep error:", error?.message);
+    }
+  };
+
+  setupCallKeep = () => {
+    try {
       RNCallKeep.setup({
+        ios: {
+          appName: "VideoSDK",
+          supportsVideo: false,
+          maximumCallGroups: "1",
+          maximumCallsPerCallGroup: "1",
+        },
         android: {
           alertTitle: "Permissions required",
           alertDescription:
@@ -17,14 +36,10 @@ class IncomingCall {
           okButton: "Ok",
         },
       });
-      RNCallKeep.setAvailable(true);
-      RNCallKeep.addEventListener("answerCall", incomingcallAnswer);
-      RNCallKeep.addEventListener("endCall", endIncomingCall);
     } catch (error) {
       console.error("initializeCallKeep error:", error?.message);
     }
   };
-
   // Use startCall to ask the system to start a call - Initiate an outgoing call from this point
   startCall = ({ handle, localizedCallerName }) => {
     // Your normal start call action
@@ -47,7 +62,7 @@ class IncomingCall {
   };
 
   displayIncomingCall = (callerName) => {
-    RNCallKeep.setAvailable(false);
+    Platform.OS === "android" && RNCallKeep.setAvailable(false);
     RNCallKeep.displayIncomingCall(
       this.getCurrentCallId(),
       callerName,
@@ -68,6 +83,20 @@ class IncomingCall {
     }
     return this.currentCallId;
   };
+
+  setupEventListeners() {
+    if (Platform.OS == "ios") {
+      // --- NOTE: You still need to subscribe / handle the rest events as usuall.
+      // --- This is just a helper whcih cache and propagate early fired events if and only if for
+      // --- "the native events which DID fire BEFORE js bridge is initialed",
+      // --- it does NOT mean this will have events each time when the app reopened.
+      // ===== Step 1: subscribe `register` event =====
+      // --- this.onVoipPushNotificationRegistered
+      // ===== Step 4: register =====
+      // --- it will be no-op if you have subscribed before (like in native side)
+      // --- but will fire `register` event if we have latest cahced voip token ( it may be empty if no token at all )
+    }
+  }
 }
 
 export default Incomingvideocall = new IncomingCall();

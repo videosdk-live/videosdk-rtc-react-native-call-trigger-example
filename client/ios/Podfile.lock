@@ -1117,6 +1117,8 @@ PODS:
     - React-RCTImage
   - RNSVG (12.5.0):
     - React-Core
+  - RNVoipPushNotification (3.3.1):
+    - React-Core
   - Toast (4.0.0)
   - Yoga (1.14.0)
 
@@ -1170,6 +1172,7 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - RNVoipPushNotification (from `../node_modules/react-native-voip-push-notification`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1286,6 +1289,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  RNVoipPushNotification:
+    :path: "../node_modules/react-native-voip-push-notification"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1355,6 +1360,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 62232ba8f562f7dea5ba1b3383494eb5bf97a4d3
   RNScreens: 34cc502acf1b916c582c60003dc3089fa01dc66d
   RNSVG: 6adc5c52d2488a476248413064b7f2832e639057
+  RNVoipPushNotification: 1617f5a07be24066830213ae9252cb790b53886f
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 99caf8d5ab45e9d637ee6e0174ec16fbbb01bcfc
 

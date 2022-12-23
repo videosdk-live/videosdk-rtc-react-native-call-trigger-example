@@ -1,1 +1,3 @@
 node_modules/
+!spec/*.json
+AuthKey_93JKT8SSVF.p8

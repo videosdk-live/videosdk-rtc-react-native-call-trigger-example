@@ -46,6 +46,7 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+/ios/GoogleService-Info.plist
 .env
 yarn.lock
 android/local.properties

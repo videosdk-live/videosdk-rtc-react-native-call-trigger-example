@@ -26,10 +26,11 @@ import {
 } from "../../api/api";
 import { SCREEN_NAMES } from "../../navigators/screenNames";
 import Incomingvideocall from "../../utils/incoming-video-call";
+import VoipPushNotification from "react-native-voip-push-notification";
 
 export default function Home({ navigation }) {
   const [number, setNumber] = useState("");
-  const [fcmToken, setfcmToken] = useState("");
+  const [firebaseToken, setFirebaseToken] = useState({ val: "", platform: "" });
   const [displayNum, setDisplayNum] = useState(null);
   const [isCalling, setisCalling] = useState(false);
   const [videosdkToken, setVideosdkToken] = useState(null);
@@ -42,8 +43,24 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     async function getFCMtoken() {
-      const token = await messaging().getToken();
-      setfcmToken(token);
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      console.log("enabled:", enabled);
+
+      if (enabled) {
+        if (Platform.OS === "android") {
+          const token = await messaging().getToken();
+          console.log("token:", token);
+          setFirebaseToken({
+            val: token,
+            platform: "ANDROID",
+          });
+        } else {
+          VoipPushNotification.registerVoipToken();
+        }
+      }
     }
 
     async function getTokenAndMeetingId() {
@@ -112,11 +129,59 @@ export default function Home({ navigation }) {
   }, []);
 
   useEffect(() => {
+    VoipPushNotification.addEventListener("register", (token) => {
+      setFirebaseToken({
+        val: token,
+        platform: "iOS",
+      });
+    });
+
+    VoipPushNotification.addEventListener("notification", (notification) => {
+      console.log("notification", notification);
+      VoipPushNotification.onVoipNotificationCompleted(notification.uuid);
+    });
+
+    VoipPushNotification.addEventListener("didLoadWithEvents", (events) => {
+      console.log("DID LOAD", events);
+      const { callerInfo, videoSDKInfo, type } =
+        events.length > 1 && events[1].data;
+
+      if (type === "CALL_INITIATED") {
+        const incomingCallAnswer = ({ callUUID }) => {
+          updateCallStatus({
+            callerInfo,
+            type: "ACCEPTED",
+          });
+          navigation.navigate(SCREEN_NAMES.Meeting, {
+            name: "Person B",
+            token: videoSDKInfo.token,
+            meetingId: videoSDKInfo.meetingId,
+          });
+        };
+
+        const endIncomingCall = () => {
+          console.log("EVENTS endIncomingCall");
+          Incomingvideocall.endIncomingcallAnswer();
+          updateCallStatus({ callerInfo, type: "REJECTED" });
+        };
+
+        Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
+      }
+    });
+
+    return () => {
+      VoipPushNotification.removeEventListener("didLoadWithEvents");
+      VoipPushNotification.removeEventListener("register");
+      VoipPushNotification.removeEventListener("notification");
+    };
+  }, []);
+
+  useEffect(() => {
     async function checkTokenExist() {
-      if (fcmToken) {
+      if (firebaseToken.val) {
         const querySnapshot = await firestore()
           .collection("users")
-          .where("token", "==", fcmToken)
+          .where("token", "==", firebaseToken.val)
           .get();
         const uids = querySnapshot.docs.map((doc) => {
           if (doc && doc?.data()?.callerId) {
@@ -133,12 +198,13 @@ export default function Home({ navigation }) {
       }
     }
     checkTokenExist();
-  }, [fcmToken]);
+  }, [firebaseToken]);
 
   const addUser = () => {
     const obj = {
       callerId: Math.floor(10000000 + Math.random() * 90000000).toString(),
-      token: fcmToken,
+      token: firebaseToken.val,
+      platform: firebaseToken.platform,
     };
     firestore()
       .collection("users")
@@ -264,10 +330,19 @@ export default function Home({ navigation }) {
                       } else {
                         Toast.show("CallerId Match!");
                         initiateCall({
-                          calleeFCM: data[0]?.data()?.token,
-                          callerFCM: fcmToken,
-                          videosdkToken: videosdkTokenRef.current,
-                          videosdkMeeting: videosdkMeetingRef.current,
+                          callerInfo: {
+                            name: "Person A",
+                            token: firebaseToken.val,
+                            platform: firebaseToken.platform,
+                          },
+                          calleeInfo: {
+                            token: data[0]?.data()?.token,
+                            platform: data[0]?.data()?.platform,
+                          },
+                          videoSDKInfo: {
+                            token: videosdkTokenRef.current,
+                            meetingId: videosdkMeetingRef.current,
+                          },
                         });
                         setisCalling(true);
                       }
