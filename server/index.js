@@ -121,20 +121,22 @@ app.post("/update-call", (req, res) => {
       console.log("RESULT", result);
       res.send(result);
     });
-  } else if (calleeInfo.platform === "ANDROID") {
+  } else if (callerInfo.platform === "ANDROID") {
     var message = {
       data: {
         type: type,
       },
-      token: FCMToken,
+      token: callerInfo.token,
     };
 
     console.log("message", message);
     FCM.send(message, function (err, response) {
       if (err) {
         console.log("error found", err);
+        res.send(err);
       } else {
         console.log("response here", response);
+        res.send(response);
       }
     });
   }
