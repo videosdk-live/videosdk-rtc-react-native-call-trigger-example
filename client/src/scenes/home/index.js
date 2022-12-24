@@ -82,7 +82,7 @@ export default function Home({ navigation }) {
         case "CALL_INITIATED":
           const incomingCallAnswer = ({ callUUID }) => {
             updateCallStatus({
-              fcmToken: callerInfo.token,
+              callerInfo,
               type: "ACCEPTED",
             });
             Incomingvideocall.endIncomingcallAnswer(callUUID);
@@ -96,7 +96,7 @@ export default function Home({ navigation }) {
 
           const endIncomingCall = () => {
             Incomingvideocall.endIncomingcallAnswer();
-            updateCallStatus({ fcmToken: callerInfo.token, type: "REJECTED" });
+            updateCallStatus({ callerInfo, type: "REJECTED" });
           };
 
           Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
@@ -139,6 +139,51 @@ export default function Home({ navigation }) {
     VoipPushNotification.addEventListener("notification", (notification) => {
       console.log("notification", notification);
       VoipPushNotification.onVoipNotificationCompleted(notification.uuid);
+
+      const { callerInfo, videoSDKInfo, type } = notification;
+
+      switch (type) {
+        case "CALL_INITIATED":
+          const incomingCallAnswer = ({ callUUID }) => {
+            updateCallStatus({
+              callerInfo,
+              type: "ACCEPTED",
+            });
+            setisCalling(false);
+            navigation.navigate(SCREEN_NAMES.Meeting, {
+              name: "Person B",
+              token: videoSDKInfo.token,
+              meetingId: videoSDKInfo.meetingId,
+            });
+          };
+
+          const endIncomingCall = () => {
+            Incomingvideocall.endIncomingcallAnswer();
+            updateCallStatus({ callerInfo, type: "REJECTED" });
+          };
+
+          Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
+          Incomingvideocall.displayIncomingCall(callerInfo.name);
+
+          break;
+        case "ACCEPTED":
+          setisCalling(false);
+          navigation.navigate(SCREEN_NAMES.Meeting, {
+            name: "Person B",
+            token: videosdkTokenRef.current,
+            meetingId: videosdkMeetingRef.current,
+          });
+          break;
+        case "REJECTED":
+          Toast.show("Call Rejected");
+          setisCalling(false);
+          break;
+        case "DISCONNECT":
+          Incomingvideocall.endIncomingcallAnswer();
+          break;
+        default:
+          Toast.show("Call Could not placed");
+      }
     });
 
     VoipPushNotification.addEventListener("didLoadWithEvents", (events) => {
@@ -414,15 +459,15 @@ export default function Home({ navigation }) {
           >
             <TouchableOpacity
               onPress={async () => {
-                const data = await getCallee(number);
-                if (data) {
-                  const token = data[0]?.data()?.token;
-                  updateCallStatus({
-                    fcmToken: token,
-                    type: "DISCONNECT",
-                  });
-                  setisCalling(false);
-                }
+                // const data = await getCallee(number);
+                // if (data) {
+                //   const token = data[0]?.data()?.token;
+                //   updateCallStatus({
+                //     fcmToken: token,
+                //     type: "DISCONNECT",
+                //   });
+                //   setisCalling(false);
+                // }
               }}
               style={{
                 backgroundColor: "#FF5D5D",
