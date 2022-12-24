@@ -75,20 +75,20 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage((remoteMessage) => {
-      const { token, meetingId, callerName, callerFCM, type } =
-        remoteMessage.data;
+      const { callerInfo, videoSDKInfo, type } = remoteMessage.data;
+
       console.log("HOME--- TYPE", type);
       switch (type) {
         case "CALL_INITIATED":
           const incomingCallAnswer = ({ callUUID }) => {
             updateCallStatus({
-              fcmToken: callerFCM,
+              fcmToken: callerInfo.token,
               type: "ACCEPTED",
             });
             Incomingvideocall.endIncomingcallAnswer(callUUID);
             setisCalling(false);
             Linking.openURL(
-              `videocalling://meetingscreen/${token}/${meetingId}`
+              `videocalling://meetingscreen/${videoSDKInfo.token}/${videoSDKInfo.meetingId}`
             ).catch((err) => {
               Toast.show(`Error`, err);
             });
@@ -96,11 +96,11 @@ export default function Home({ navigation }) {
 
           const endIncomingCall = () => {
             Incomingvideocall.endIncomingcallAnswer();
-            updateCallStatus({ fcmToken: callerFCM, type: "REJECTED" });
+            updateCallStatus({ fcmToken: callerInfo.token, type: "REJECTED" });
           };
 
           Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
-          Incomingvideocall.displayIncomingCall(callerName);
+          Incomingvideocall.displayIncomingCall(callerInfo.name);
 
           break;
         case "ACCEPTED":
@@ -284,11 +284,13 @@ export default function Home({ navigation }) {
                   }}
                   onPress={() => {
                     Clipboard.setString(displayNum);
-                    Toast.show("Copied");
-                    Alert.alert(
-                      "Information",
-                      "This callerId will be unavailable, once you uninstall the App."
-                    );
+                    if (Platform.OS === "android") {
+                      Toast.show("Copied");
+                      Alert.alert(
+                        "Information",
+                        "This callerId will be unavailable, once you uninstall the App."
+                      );
+                    }
                   }}
                 >
                   <Copy fill={colors.primary[100]} width={16} height={16} />

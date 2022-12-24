@@ -18,19 +18,18 @@ Platform.OS == "android" && StatusBar.setBackgroundColor(colors.primary[900]);
 register();
 
 const firebaseListener = async (remoteMessage) => {
-  const { token, meetingId, callerName, callerFCM, type } = remoteMessage.data;
-  console.log("# index js TYPE --- ", type);
+  const { callerInfo, videoSDKInfo, type } = remoteMessage.data;
 
   if (type === "CALL_INITIATED") {
     const incomingCallAnswer = ({ callUUID }) => {
       Incomingvideocall.backToForeground();
       updateCallStatus({
-        fcmToken: callerFCM,
+        fcmToken: callerInfo.token,
         type: "ACCEPTED",
       });
       Incomingvideocall.endIncomingcallAnswer(callUUID);
       Linking.openURL(
-        `videocalling://meetingscreen/${token}/${meetingId}`
+        `videocalling://meetingscreen/${videoSDKInfo.token}/${videoSDKInfo.meetingId}`
       ).catch((err) => {
         Toast.show(`Error`, err);
       });
@@ -38,11 +37,11 @@ const firebaseListener = async (remoteMessage) => {
 
     const endIncomingCall = () => {
       Incomingvideocall.endIncomingcallAnswer();
-      updateCallStatus({ fcmToken: callerFCM, type: "REJECTED" });
+      updateCallStatus({ fcmToken: callerInfo.token, type: "REJECTED" });
     };
 
     Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
-    Incomingvideocall.displayIncomingCall(callerName);
+    Incomingvideocall.displayIncomingCall(callerInfo.name);
     Incomingvideocall.backToForeground();
   }
 };
