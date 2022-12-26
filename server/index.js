@@ -24,7 +24,7 @@ app.post("/initiate-call", (req, res) => {
   const { calleeInfo, callerInfo, videoSDKInfo } = req.body;
 
   if (calleeInfo.platform === "iOS") {
-    let deviceToken = calleeInfo.token;
+    let deviceToken = calleeInfo.APN;
     var options = {
       token: {
         key: Key,
@@ -61,18 +61,20 @@ app.post("/initiate-call", (req, res) => {
     });
   } else if (calleeInfo.platform === "ANDROID") {
     var FCMtoken = calleeInfo.token;
+    const info = JSON.stringify({
+      callerInfo,
+      videoSDKInfo,
+      type: "CALL_INITIATED",
+    });
     var message = {
       data: {
-        callerInfo,
-        videoSDKInfo,
-        type: "CALL_INITIATED",
+        info,
       },
       android: {
         priority: "high",
       },
       token: FCMtoken,
     };
-
     FCM.send(message, function (err, response) {
       if (err) {
         console.log("error found", err);
@@ -90,37 +92,8 @@ app.post("/initiate-call", (req, res) => {
 
 app.post("/update-call", (req, res) => {
   const { callerInfo, type } = req.body;
-  console.log("BODY", { callerInfo, type });
   if (callerInfo.platform === "iOS") {
-    let deviceToken = callerInfo.token;
-    var options = {
-      token: {
-        key: Key,
-        keyId: "93JKT8SSVF",
-        teamId: "8GZ776NSU2",
-      },
-      production: false,
-    };
-
-    var apnProvider = new apn.Provider(options);
-
-    var note = new apn.Notification();
-
-    note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-    note.badge = 1;
-    note.sound = "ping.aiff";
-    note.alert = "You have a new message";
-    note.rawPayload = {
-      aps: {
-        "content-available": 1,
-      },
-      type: type,
-      uuid: uuidv4(),
-    };
-    apnProvider.send(note, deviceToken).then((result) => {
-      console.log("RESULT", result);
-      res.send(result);
-    });
+    let deviceToken = "ss";
   } else if (callerInfo.platform === "ANDROID") {
     var message = {
       data: {

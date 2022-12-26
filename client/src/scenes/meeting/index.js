@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView } from "react-native";
+import { Platform, SafeAreaView } from "react-native";
 import colors from "../../styles/colors";
 import {
   MeetingConsumer,
@@ -7,6 +7,7 @@ import {
 } from "@videosdk.live/react-native-sdk";
 import MeetingContainer from "./MeetingContainer";
 import { SCREEN_NAMES } from "../../navigators/screenNames";
+import IncomingVideoCall from "../../utils/incoming-video-call";
 
 export default function ({ navigation, route }) {
   const token = route.params.token;
@@ -24,7 +25,7 @@ export default function ({ navigation, route }) {
       <MeetingProvider
         config={{
           meetingId: meetingId,
-          micEnabled: micEnabled,
+          micEnabled: false,
           webcamEnabled: webcamEnabled,
           name: name,
           notification: {
@@ -37,6 +38,7 @@ export default function ({ navigation, route }) {
         <MeetingConsumer
           {...{
             onMeetingLeft: () => {
+              Platform.OS == "ios" && IncomingVideoCall.endAllCall();
               navigation.navigate(SCREEN_NAMES.Home);
             },
           }}

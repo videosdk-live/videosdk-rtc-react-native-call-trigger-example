@@ -84,6 +84,12 @@ class IncomingCall {
     return this.currentCallId;
   };
 
+  endAllCall = () => {
+    RNCallKeep.endAllCalls();
+    this.currentCallId = null;
+    this.removeEvents();
+  };
+
   setupEventListeners() {
     if (Platform.OS == "ios") {
       // --- NOTE: You still need to subscribe / handle the rest events as usuall.
