@@ -91,11 +91,9 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage((remoteMessage) => {
-      console.log("remoteMessage", remoteMessage);
-
-      const { callerInfo, videoSDKInfo, type } = remoteMessage.data;
-
-      console.log("HOME--- TYPE", type);
+      const { callerInfo, videoSDKInfo, type } = JSON.parse(
+        remoteMessage.data.info
+      );
       switch (type) {
         case "CALL_INITIATED":
           const incomingCallAnswer = ({ callUUID }) => {
@@ -134,7 +132,9 @@ export default function Home({ navigation }) {
           setisCalling(false);
           break;
         case "DISCONNECT":
-          Incomingvideocall.endIncomingcallAnswer();
+          Platform.OS === "ios"
+            ? Incomingvideocall.endAllCall()
+            : Incomingvideocall.endIncomingcallAnswer();
           break;
         default:
           Toast.show("Call Could not placed");
@@ -151,11 +151,34 @@ export default function Home({ navigation }) {
       setAPN(token);
     });
 
+    VoipPushNotification.addEventListener("notification", (notification) => {
+      const { callerInfo, videoSDKInfo, type } = notification;
+      if (type === "CALL_INITIATED") {
+        const incomingCallAnswer = ({ callUUID }) => {
+          updateCallStatus({
+            callerInfo,
+            type: "ACCEPTED",
+          });
+          navigation.navigate(SCREEN_NAMES.Meeting, {
+            name: "Person B",
+            token: videoSDKInfo.token,
+            meetingId: videoSDKInfo.meetingId,
+          });
+        };
+        const endIncomingCall = () => {
+          Incomingvideocall.endAllCall();
+          updateCallStatus({ callerInfo, type: "REJECTED" });
+        };
+        Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
+      } else if (type === "DISCONNECT") {
+        Incomingvideocall.endAllCall();
+      }
+      VoipPushNotification.onVoipNotificationCompleted(notification.uuid);
+    });
+
     VoipPushNotification.addEventListener("didLoadWithEvents", (events) => {
       const { callerInfo, videoSDKInfo, type } =
         events.length > 1 && events[1].data;
-      console.log("BACK GROUND DATA events", events);
-
       if (type === "CALL_INITIATED") {
         const incomingCallAnswer = ({ callUUID }) => {
           updateCallStatus({
@@ -170,7 +193,6 @@ export default function Home({ navigation }) {
         };
 
         const endIncomingCall = () => {
-          console.log("EVENTS endIncomingCall");
           Incomingvideocall.endAllCall();
           updateCallStatus({ callerInfo, type: "REJECTED" });
         };
@@ -409,15 +431,14 @@ export default function Home({ navigation }) {
           >
             <TouchableOpacity
               onPress={async () => {
-                // const data = await getCallee(number);
-                // if (data) {
-                //   const token = data[0]?.data()?.token;
-                //   updateCallStatus({
-                //     fcmToken: token,
-                //     type: "DISCONNECT",
-                //   });
-                //   setisCalling(false);
-                // }
+                const data = await getCallee(number);
+                if (data) {
+                  updateCallStatus({
+                    callerInfo: data[0]?.data(),
+                    type: "DISCONNECT",
+                  });
+                  setisCalling(false);
+                }
               }}
               style={{
                 backgroundColor: "#FF5D5D",

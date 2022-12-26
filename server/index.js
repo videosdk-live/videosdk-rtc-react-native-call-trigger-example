@@ -20,7 +20,6 @@ app.get("/", (req, res) => {
 });
 
 app.post("/initiate-call", (req, res) => {
-  console.log("BODY", req.body);
   const { calleeInfo, callerInfo, videoSDKInfo } = req.body;
 
   if (calleeInfo.platform === "iOS") {
@@ -77,12 +76,9 @@ app.post("/initiate-call", (req, res) => {
     };
     FCM.send(message, function (err, response) {
       if (err) {
-        console.log("error found", err);
         res.send(err);
       } else {
         res.send(response);
-
-        console.log("response here", response);
       }
     });
   } else {
@@ -92,27 +88,35 @@ app.post("/initiate-call", (req, res) => {
 
 app.post("/update-call", (req, res) => {
   const { callerInfo, type } = req.body;
-  if (callerInfo.platform === "iOS") {
-    let deviceToken = "ss";
-  } else if (callerInfo.platform === "ANDROID") {
-    var message = {
-      data: {
-        type: type,
-      },
-      token: callerInfo.token,
-    };
+  const info = JSON.stringify({
+    callerInfo,
+    type,
+  });
 
-    console.log("message", message);
-    FCM.send(message, function (err, response) {
-      if (err) {
-        console.log("error found", err);
-        res.send(err);
-      } else {
-        console.log("response here", response);
-        res.send(response);
-      }
-    });
-  }
+  var message = {
+    data: {
+      info,
+    },
+    apns: {
+      headers: {
+        "apns-priority": "10",
+      },
+      payload: {
+        aps: {
+          badge: 1,
+        },
+      },
+    },
+    token: callerInfo.token,
+  };
+
+  FCM.send(message, function (err, response) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(response);
+    }
+  });
 });
 
 app.listen(9000, () => {
