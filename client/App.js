@@ -7,7 +7,7 @@ import Meeting from "./src/scenes/meeting";
 import { LogBox, Text, Alert } from "react-native";
 import Home from "./src/scenes/home";
 import OverlayPermissionModule from "videosdk-rn-android-overlay-permission";
-import IncomingVideoCall from "./src/utils/incoming-video-call";
+import RNCallKeep from "react-native-callkeep";
 LogBox.ignoreLogs(["Warning: ..."]);
 LogBox.ignoreAllLogs();
 
@@ -26,36 +26,46 @@ const linking = {
 
 export default function App() {
   useEffect(() => {
-    setTimeout(() => {
-      if (Platform.OS === "android") {
-        OverlayPermissionModule.isRequestOverlayPermissionGranted((status) => {
-          if (status) {
-            Alert.alert(
-              "Please Enable the additional permissions",
-              "You will not receive call while the app is in background if you disable these permissions",
-              [
-                {
-                  text: "Cancel",
-                  onPress: () => console.log("Cancel Pressed"),
-                  style: "cancel",
-                },
-                {
-                  text: "OK",
-                  onPress: () =>
-                    OverlayPermissionModule.requestOverlayPermission(),
-                },
-              ],
-              { cancelable: false }
-            );
-          }
-        });
-      }
-    }, 3000);
-  }, []);
+    const options = {
+      ios: {
+        appName: "VideoSDK",
+      },
+      android: {
+        alertTitle: "Permissions required",
+        alertDescription:
+          "This application needs to access your phone accounts",
+        cancelButton: "Cancel",
+        okButton: "ok",
+        imageName: "phone_account_icon",
+      },
+    };
 
-  useEffect(() => {
-    IncomingVideoCall.setupCallKeep();
-    IncomingVideoCall.setupEventListeners();
+    if (Platform.OS === "android") {
+      OverlayPermissionModule.isRequestOverlayPermissionGranted((status) => {
+        if (status) {
+          Alert.alert(
+            "Please Enable the additional permissions",
+            "You will not receive call while the app is in background if you disable these permissions",
+            [
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel",
+              },
+              {
+                text: "OK",
+                onPress: () => {
+                  OverlayPermissionModule.requestOverlayPermission();
+                  RNCallKeep.setup(options);
+                  RNCallKeep.setAvailable(true);
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      });
+    }
   }, []);
 
   return (
