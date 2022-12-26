@@ -11,6 +11,7 @@
 ### Step 1: Setup Firebase app
  1. Create Firebase iOS App within Firebase Project.
  2. Download and add `GoogleService-info.plist` file to project
+ 3. 
 ![plot](./public/image-2.png)
  
  
@@ -25,16 +26,20 @@ You must upload an APNs Auth Key in order to implement push notifications. We ne
 To create an APNs auth key, follow the steps below.
 
 Visit the Apple  [Developer Member Center](https://developer.apple.com/account/)
+
 ![plot](./public/image-4.png)
 
 
 Click on `Certificates, Identifiers & Profiles`. Go to Keys from the left side. Create a new Auth Key by clicking on the plus button in the top right side.
+
 ![plot](./public/image-5.png)
 
 On the following page, add a Key Name, and select APNs.
+
 ![plot](./public/image-6.png)
 
 Click on the Register button.
+
 ![plot](./public/image-7.png)
 
 You can download your auth key file from this page and upload this file to Firebase dashboard without changing its name.
@@ -53,10 +58,12 @@ Enter Key ID and Team ID. Key ID is in the file name, `AuthKey_{Key ID}.p8` and 
 ### Note:
 
 Enable Push Notifications in Capabilities
+
 ![plot](./public/image-9.png)
 ![plot](./public/image-10.png)
 
 Enable selcted permission in Background Modes
+
 ![plot](./public/permission.webp)
 
 
@@ -64,6 +71,7 @@ Enable selcted permission in Background Modes
 
 You have to add `AuthKey_{Key ID}.p8` under server directory which we generated from Apple Dev and upload it to Firebase in client setup.
 This will helps us in VoIP push notification.
+
 ![plot](./public/image-11.png)
 
 Update KeyId and teamId in APN provider located inside `/initiate-call` API.
