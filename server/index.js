@@ -27,8 +27,8 @@ app.post("/initiate-call", (req, res) => {
     var options = {
       token: {
         key: Key,
-        keyId: "93JKT8SSVF",
-        teamId: "8GZ776NSU2",
+        keyId: "YOUR_KEY_ID",
+        teamId: "YOUR_TEAM_ID",
       },
       production: false,
     };
