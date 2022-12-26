@@ -22,7 +22,8 @@ You must upload an APNs Auth Key in order to implement push notifications. We ne
 -   Key ID
 -   Your app’s bundle ID
 
-To create an APNs auth key, follow the steps below.  
+To create an APNs auth key, follow the steps below.
+
 Visit the Apple  [Developer Member Center](https://developer.apple.com/account/)
 ![plot](./public/image-4.png)
 
