@@ -5,7 +5,7 @@
 - [x] Android
 - [x] iOS
 
-Let's keep a watch on the third-party libraries utilised in this repository before moving on.
+Before continuing, let's keep an eye on the third-party libraries used in this repository.
 
 1. [React Native CallKeep](https://www.npmjs.com/package/react-native-callkeep)
 2. [React Native VoIP Push Notification](https://www.npmjs.com/package/react-native-voip-push-notification)
