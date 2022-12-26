@@ -18,13 +18,15 @@ Platform.OS == "android" && StatusBar.setBackgroundColor(colors.primary[900]);
 register();
 
 const firebaseListener = async (remoteMessage) => {
-  const { callerInfo, videoSDKInfo, type } = remoteMessage.data;
+  const { callerInfo, videoSDKInfo, type } = JSON.parse(
+    remoteMessage.data.info
+  );
 
   if (type === "CALL_INITIATED") {
     const incomingCallAnswer = ({ callUUID }) => {
       Incomingvideocall.backToForeground();
       updateCallStatus({
-        fcmToken: callerInfo.token,
+        callerInfo,
         type: "ACCEPTED",
       });
       Incomingvideocall.endIncomingcallAnswer(callUUID);
@@ -37,7 +39,7 @@ const firebaseListener = async (remoteMessage) => {
 
     const endIncomingCall = () => {
       Incomingvideocall.endIncomingcallAnswer();
-      updateCallStatus({ fcmToken: callerInfo.token, type: "REJECTED" });
+      updateCallStatus({ callerInfo, type: "REJECTED" });
     };
 
     Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
