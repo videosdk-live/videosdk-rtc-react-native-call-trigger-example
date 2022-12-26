@@ -13,7 +13,11 @@ target 'ReactNativeCallTrigger' do
   )
 
   pod 'react-native-webrtc', :path => '../node_modules/@videosdk.live/react-native-webrtc'
-
+  pod 'Firebase', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'RNCallKeep', :path => '../node_modules/react-native-callkeep'
 
   target 'ReactNativeCallTriggerTests' do
     inherit! :complete

@@ -1,19 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
   Clipboard,
   TouchableOpacity,
   ActivityIndicator,
-  Dimensions,
-  Platform,
 } from "react-native";
 import { useMeeting } from "@videosdk.live/react-native-sdk";
 import {
   CallEnd,
   CameraSwitch,
   Copy,
-  Leave,
   MicOff,
   MicOn,
   VideoOff,
@@ -29,7 +26,6 @@ import Toast from "react-native-simple-toast";
 
 export default function OneToOneMeetingViewer() {
   const {
-    join,
     participants,
     localWebcamOn,
     localMicOn,
@@ -38,7 +34,6 @@ export default function OneToOneMeetingViewer() {
     toggleWebcam,
     toggleMic,
     meetingId,
-    meeting,
   } = useMeeting({
     onError: (data) => {
       const { code, message } = data;

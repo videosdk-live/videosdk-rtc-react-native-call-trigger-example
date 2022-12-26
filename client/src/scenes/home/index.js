@@ -26,24 +26,57 @@ import {
 } from "../../api/api";
 import { SCREEN_NAMES } from "../../navigators/screenNames";
 import Incomingvideocall from "../../utils/incoming-video-call";
+import VoipPushNotification from "react-native-voip-push-notification";
 
 export default function Home({ navigation }) {
   const [number, setNumber] = useState("");
-  const [fcmToken, setfcmToken] = useState("");
-  const [displayNum, setDisplayNum] = useState(null);
+  const [firebaseUserConfig, setfirebaseUserConfig] = useState(null);
   const [isCalling, setisCalling] = useState(false);
   const [videosdkToken, setVideosdkToken] = useState(null);
   const [videosdkMeeting, setVideosdkMeeting] = useState(null);
+  const [APN, setAPN] = useState(null);
 
   const videosdkTokenRef = useRef();
   const videosdkMeetingRef = useRef();
+  const APNRef = useRef();
   videosdkTokenRef.current = videosdkToken;
   videosdkMeetingRef.current = videosdkMeeting;
+  APNRef.current = APN;
 
   useEffect(() => {
     async function getFCMtoken() {
-      const token = await messaging().getToken();
-      setfcmToken(token);
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      Platform.OS === "ios" && VoipPushNotification.registerVoipToken();
+
+      if (enabled) {
+        const token = await messaging().getToken();
+        const querySnapshot = await firestore()
+          .collection("users")
+          .where("token", "==", token)
+          .get();
+
+        const uids = querySnapshot.docs.map((doc) => {
+          if (doc && doc?.data()?.callerId) {
+            const { token, platform, APN, callerId } = doc?.data();
+            setfirebaseUserConfig({
+              callerId,
+              token,
+              platform,
+              APN,
+            });
+          }
+          return doc;
+        });
+
+        if (uids && uids.length == 0) {
+          addUser({ token });
+        } else {
+          console.log("Token Found");
+        }
+      }
     }
 
     async function getTokenAndMeetingId() {
@@ -58,20 +91,20 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage((remoteMessage) => {
-      const { token, meetingId, callerName, callerFCM, type } =
-        remoteMessage.data;
-      console.log("HOME--- TYPE", type);
+      const { callerInfo, videoSDKInfo, type } = JSON.parse(
+        remoteMessage.data.info
+      );
       switch (type) {
         case "CALL_INITIATED":
           const incomingCallAnswer = ({ callUUID }) => {
             updateCallStatus({
-              fcmToken: callerFCM,
+              callerInfo,
               type: "ACCEPTED",
             });
             Incomingvideocall.endIncomingcallAnswer(callUUID);
             setisCalling(false);
             Linking.openURL(
-              `videocalling://meetingscreen/${token}/${meetingId}`
+              `videocalling://meetingscreen/${videoSDKInfo.token}/${videoSDKInfo.meetingId}`
             ).catch((err) => {
               Toast.show(`Error`, err);
             });
@@ -79,11 +112,11 @@ export default function Home({ navigation }) {
 
           const endIncomingCall = () => {
             Incomingvideocall.endIncomingcallAnswer();
-            updateCallStatus({ fcmToken: callerFCM, type: "REJECTED" });
+            updateCallStatus({ callerInfo, type: "REJECTED" });
           };
 
           Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
-          Incomingvideocall.displayIncomingCall(callerName);
+          Incomingvideocall.displayIncomingCall(callerInfo.name);
 
           break;
         case "ACCEPTED":
@@ -99,7 +132,9 @@ export default function Home({ navigation }) {
           setisCalling(false);
           break;
         case "DISCONNECT":
-          Incomingvideocall.endIncomingcallAnswer();
+          Platform.OS === "ios"
+            ? Incomingvideocall.endAllCall()
+            : Incomingvideocall.endIncomingcallAnswer();
           break;
         default:
           Toast.show("Call Could not placed");
@@ -112,40 +147,83 @@ export default function Home({ navigation }) {
   }, []);
 
   useEffect(() => {
-    async function checkTokenExist() {
-      if (fcmToken) {
-        const querySnapshot = await firestore()
-          .collection("users")
-          .where("token", "==", fcmToken)
-          .get();
-        const uids = querySnapshot.docs.map((doc) => {
-          if (doc && doc?.data()?.callerId) {
-            setDisplayNum(doc?.data()?.callerId);
-          }
-          return doc;
-        });
+    VoipPushNotification.addEventListener("register", (token) => {
+      setAPN(token);
+    });
 
-        if (uids && uids.length == 0) {
-          addUser();
-        } else {
-          console.log("Token Found");
-        }
+    VoipPushNotification.addEventListener("notification", (notification) => {
+      const { callerInfo, videoSDKInfo, type } = notification;
+      if (type === "CALL_INITIATED") {
+        const incomingCallAnswer = ({ callUUID }) => {
+          updateCallStatus({
+            callerInfo,
+            type: "ACCEPTED",
+          });
+          navigation.navigate(SCREEN_NAMES.Meeting, {
+            name: "Person B",
+            token: videoSDKInfo.token,
+            meetingId: videoSDKInfo.meetingId,
+          });
+        };
+        const endIncomingCall = () => {
+          Incomingvideocall.endAllCall();
+          updateCallStatus({ callerInfo, type: "REJECTED" });
+        };
+        Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
+      } else if (type === "DISCONNECT") {
+        Incomingvideocall.endAllCall();
       }
-    }
-    checkTokenExist();
-  }, [fcmToken]);
+      VoipPushNotification.onVoipNotificationCompleted(notification.uuid);
+    });
 
-  const addUser = () => {
+    VoipPushNotification.addEventListener("didLoadWithEvents", (events) => {
+      const { callerInfo, videoSDKInfo, type } =
+        events.length > 1 && events[1].data;
+      if (type === "CALL_INITIATED") {
+        const incomingCallAnswer = ({ callUUID }) => {
+          updateCallStatus({
+            callerInfo,
+            type: "ACCEPTED",
+          });
+          navigation.navigate(SCREEN_NAMES.Meeting, {
+            name: "Person B",
+            token: videoSDKInfo.token,
+            meetingId: videoSDKInfo.meetingId,
+          });
+        };
+
+        const endIncomingCall = () => {
+          Incomingvideocall.endAllCall();
+          updateCallStatus({ callerInfo, type: "REJECTED" });
+        };
+
+        Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
+      }
+    });
+
+    return () => {
+      VoipPushNotification.removeEventListener("didLoadWithEvents");
+      VoipPushNotification.removeEventListener("register");
+      VoipPushNotification.removeEventListener("notification");
+    };
+  }, []);
+
+  const addUser = ({ token }) => {
+    const platform = Platform.OS === "android" ? "ANDROID" : "iOS";
     const obj = {
       callerId: Math.floor(10000000 + Math.random() * 90000000).toString(),
-      token: fcmToken,
+      token,
+      platform,
     };
+    if (platform == "iOS") {
+      obj.APN = APNRef.current;
+    }
     firestore()
       .collection("users")
       .add(obj)
       .then(() => {
+        setfirebaseUserConfig(obj);
         console.log("User added!");
-        setDisplayNum(obj.callerId);
       });
   };
 
@@ -198,13 +276,15 @@ export default function Home({ navigation }) {
               >
                 <Text
                   style={{
-                    fontSize: 36,
+                    fontSize: 32,
                     color: "#ffff",
                     letterSpacing: 8,
                     fontFamily: ROBOTO_FONTS.Roboto,
                   }}
                 >
-                  {displayNum ? displayNum : "Loading.."}
+                  {firebaseUserConfig
+                    ? firebaseUserConfig.callerId
+                    : "Loading.."}
                 </Text>
                 <TouchableOpacity
                   style={{
@@ -217,12 +297,16 @@ export default function Home({ navigation }) {
                     borderRadius: 4,
                   }}
                   onPress={() => {
-                    Clipboard.setString(displayNum);
-                    Toast.show("Copied");
-                    Alert.alert(
-                      "Information",
-                      "This callerId will be unavailable, once you uninstall the App."
+                    Clipboard.setString(
+                      firebaseUserConfig && firebaseUserConfig.callerId
                     );
+                    if (Platform.OS === "android") {
+                      Toast.show("Copied");
+                      Alert.alert(
+                        "Information",
+                        "This callerId will be unavailable, once you uninstall the App."
+                      );
+                    }
                   }}
                 >
                   <Copy fill={colors.primary[100]} width={16} height={16} />
@@ -263,11 +347,21 @@ export default function Home({ navigation }) {
                         Toast.show("CallerId Does not Match");
                       } else {
                         Toast.show("CallerId Match!");
+                        const { token, platform, APN } = data[0]?.data();
                         initiateCall({
-                          calleeFCM: data[0]?.data()?.token,
-                          callerFCM: fcmToken,
-                          videosdkToken: videosdkTokenRef.current,
-                          videosdkMeeting: videosdkMeetingRef.current,
+                          callerInfo: {
+                            name: "Person A",
+                            ...firebaseUserConfig,
+                          },
+                          calleeInfo: {
+                            token,
+                            platform,
+                            APN,
+                          },
+                          videoSDKInfo: {
+                            token: videosdkTokenRef.current,
+                            meetingId: videosdkMeetingRef.current,
+                          },
                         });
                         setisCalling(true);
                       }
@@ -339,9 +433,8 @@ export default function Home({ navigation }) {
               onPress={async () => {
                 const data = await getCallee(number);
                 if (data) {
-                  const token = data[0]?.data()?.token;
                   updateCallStatus({
-                    fcmToken: token,
+                    callerInfo: data[0]?.data(),
                     type: "DISCONNECT",
                   });
                   setisCalling(false);

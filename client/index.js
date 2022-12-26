@@ -2,7 +2,7 @@
  * @format
  */
 
-import { AppRegistry, StatusBar, Linking } from "react-native";
+import { AppRegistry, StatusBar, Linking, Platform } from "react-native";
 import App from "./App";
 import { name as appName } from "./app.json";
 import { register } from "@videosdk.live/react-native-sdk";
@@ -12,25 +12,26 @@ import React from "react";
 import Incomingvideocall from "./src/utils/incoming-video-call";
 import { updateCallStatus } from "./src/api/api";
 
-StatusBar.setBackgroundColor(colors.primary[900]);
+Platform.OS == "android" && StatusBar.setBackgroundColor(colors.primary[900]);
 
 // Register the VideoSDK service
 register();
 
 const firebaseListener = async (remoteMessage) => {
-  const { token, meetingId, callerName, callerFCM, type } = remoteMessage.data;
-  console.log("# index js TYPE --- ", type);
+  const { callerInfo, videoSDKInfo, type } = JSON.parse(
+    remoteMessage.data.info
+  );
 
   if (type === "CALL_INITIATED") {
     const incomingCallAnswer = ({ callUUID }) => {
       Incomingvideocall.backToForeground();
       updateCallStatus({
-        fcmToken: callerFCM,
+        callerInfo,
         type: "ACCEPTED",
       });
       Incomingvideocall.endIncomingcallAnswer(callUUID);
       Linking.openURL(
-        `videocalling://meetingscreen/${token}/${meetingId}`
+        `videocalling://meetingscreen/${videoSDKInfo.token}/${videoSDKInfo.meetingId}`
       ).catch((err) => {
         Toast.show(`Error`, err);
       });
@@ -38,11 +39,11 @@ const firebaseListener = async (remoteMessage) => {
 
     const endIncomingCall = () => {
       Incomingvideocall.endIncomingcallAnswer();
-      updateCallStatus({ fcmToken: callerFCM, type: "REJECTED" });
+      updateCallStatus({ callerInfo, type: "REJECTED" });
     };
 
     Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
-    Incomingvideocall.displayIncomingCall(callerName);
+    Incomingvideocall.displayIncomingCall(callerInfo.name);
     Incomingvideocall.backToForeground();
   }
 };
