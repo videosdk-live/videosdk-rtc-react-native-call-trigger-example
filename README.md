@@ -17,8 +17,6 @@ Before continuing, let's keep an eye on the third-party libraries used in this r
 
 Please follow the guidance of [iOS setup](./iOS_SETUP.md)
 
----
-
 ## Android Setup
 
 ### Step 1: Clone the sample project
