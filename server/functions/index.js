@@ -1,3 +1,4 @@
+const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -30,7 +31,7 @@ app.post("/initiate-call", (req, res) => {
         keyId: "YOUR_KEY_ID",
         teamId: "YOUR_TEAM_ID",
       },
-      production: false,
+      production: true,
     };
 
     var apnProvider = new apn.Provider(options);
@@ -55,8 +56,12 @@ app.post("/initiate-call", (req, res) => {
     note.pushType = "voip";
     note.topic = "org.reactjs.ReactNativeCallTrigger.voip";
     apnProvider.send(note, deviceToken).then((result) => {
-      console.log("RESULT", result);
-      res.send(result);
+      if (result.failed && result.failed.length > 0) {
+        console.log("RESULT", result.failed[0].response);
+        res.status(400).send(result.failed[0].response);
+      } else {
+        res.status(200).send(result);
+      }
     });
   } else if (calleeInfo.platform === "ANDROID") {
     var FCMtoken = calleeInfo.token;
@@ -76,13 +81,13 @@ app.post("/initiate-call", (req, res) => {
     };
     FCM.send(message, function (err, response) {
       if (err) {
-        res.send(err);
+        res.status(200).send(response);
       } else {
-        res.send(response);
+        res.status(400).send(response);
       }
     });
   } else {
-    res.send("Not supported platform");
+    res.status(400).send("Not supported platform");
   }
 });
 
@@ -112,9 +117,9 @@ app.post("/update-call", (req, res) => {
 
   FCM.send(message, function (err, response) {
     if (err) {
-      res.send(err);
+      res.status(200).send(response);
     } else {
-      res.send(response);
+      res.status(400).send(response);
     }
   });
 });
@@ -122,3 +127,5 @@ app.post("/update-call", (req, res) => {
 app.listen(9000, () => {
   console.log(`API server listening at http://localhost:9000`);
 });
+
+exports.app = functions.https.onRequest(app);

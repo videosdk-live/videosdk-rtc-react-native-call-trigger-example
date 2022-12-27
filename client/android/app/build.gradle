@@ -153,13 +153,11 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-         release {
-            if (project.hasProperty('rncodesample.keystore')) {
-                storeFile file('rncodesample.keystore')
+        release {
+                storeFile file('videosdk_callkit.keystore')
                 storePassword "videosdk"
-                keyAlias "rncodesample"
+                keyAlias "videosdk_callkit"
                 keyPassword "videosdk"
-            }
         }
     }
     buildTypes {
