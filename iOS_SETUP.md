@@ -11,7 +11,7 @@
 ### Step 1: Setup Firebase app
  1. Create Firebase iOS App within Firebase Project.
  2. Download and add `GoogleService-info.plist` file to project
- 3. 
+
 ![plot](./public/image-2.png)
  
  
