@@ -39,32 +39,11 @@ export default function App() {
         imageName: "phone_account_icon",
       },
     };
+    RNCallKeep.setup(options);
+    RNCallKeep.setAvailable(true);
 
     if (Platform.OS === "android") {
-      OverlayPermissionModule.isRequestOverlayPermissionGranted((status) => {
-        if (status) {
-          Alert.alert(
-            "Please Enable the additional permissions",
-            "You will not receive call while the app is in background if you disable these permissions",
-            [
-              {
-                text: "Cancel",
-                onPress: () => console.log("Cancel Pressed"),
-                style: "cancel",
-              },
-              {
-                text: "OK",
-                onPress: () => {
-                  OverlayPermissionModule.requestOverlayPermission();
-                  RNCallKeep.setup(options);
-                  RNCallKeep.setAvailable(true);
-                },
-              },
-            ],
-            { cancelable: false }
-          );
-        }
-      });
+      OverlayPermissionModule.requestOverlayPermission();
     }
   }, []);
 

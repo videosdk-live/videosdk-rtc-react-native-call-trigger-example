@@ -51,3 +51,5 @@ buck-out/
 .env
 yarn.lock
 android/local.properties
+
+database/firebaseDb.js
