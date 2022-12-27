@@ -1,9 +1,12 @@
 # React native Call Trigger with VideoSDK
 
-## Platforms
+## Demo App
 
-- [x] Android
-- [x] iOS
+📲 Download the Sample iOS app here: _COMING SOON_
+
+📱 Download the Sample Android app here: https://appdistribution.firebase.google.com/pub/i/4dc3b7d23902052c
+
+<br/>
 
 Before continuing, let's keep an eye on the third-party libraries used in this repository.
 
@@ -13,13 +16,9 @@ Before continuing, let's keep an eye on the third-party libraries used in this r
 4. [React Native Firebase - Messaging](https://rnfirebase.io/messaging/usage)
 5. [React Native Firebase - Firestore](https://rnfirebase.io/firestore/usage)
 
+⚠️ CallKit(iOS) and ConnectionService(Android) are only available on real devices, this app will not work on simulators.
+
 ## Client
-
-## iOS Setup
-
-Please follow the guidance of [iOS setup](./iOS_SETUP.md)
-
-## Android Setup
 
 ### Step 1: Clone the sample project
 
@@ -51,7 +50,29 @@ Generate temporary token from [Video SDK Account](https://app.videosdk.live/sign
 REACT_APP_VIDEOSDK_TOKEN = "TEMPORARY-TOKEN";
 ```
 
-### Step 5: Setup Firebase
+## iOS Setup
+
+Please follow the guidance of [iOS setup](./iOS_SETUP.md)
+
+### Step 1: Install packages and install pods
+
+```js
+npm install
+```
+
+```js
+cd ios && pod install
+```
+
+### Step 2: Run the application
+
+```js
+npm run ios
+```
+
+## Android Setup
+
+### Step 1: Setup Firebase
 
 #### FCM setup
 
@@ -64,7 +85,7 @@ REACT_APP_VIDEOSDK_TOKEN = "TEMPORARY-TOKEN";
 
 ![plot](./public/image-1.png)
 
-### Step 6: Install packages and run the project
+### Step 2: Install packages and run the project
 
 ```js
 npm install
@@ -73,6 +94,40 @@ npm install
 ```js
 npm run android
 ```
+
+### Step 3: Allow calling and overlay permissions
+
+After successfully installing the app, app will ask `Display over other apps` and `Access phone accounts` permission.
+
+For an app to handle calls in a dead or background state, both permissions are required.
+
+### 1. Display over other apps permission
+
+#### Xiomi device
+
+![plot](./public/xiomi-1.png)
+
+#### Other device
+
+![plot](./public/ot-1.png)
+
+### 2. Access phone accounts permission
+
+![plot](./public/ot-2.png)
+
+Now, different device have different ways to allow call account permissions.
+
+#### Xiomi device
+
+![plot](./public/xiomi-2.png)
+
+#### Other device
+
+![plot](./public/ot-3.png)
+
+Click on `All calling accounts` and allow the app to receive call.
+
+![plot](./public/ot-4.png)
 
 _**NOTE : It is necesary to setup local server before run the project.**_
 
