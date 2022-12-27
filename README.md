@@ -10,6 +10,8 @@ Before continuing, let's keep an eye on the third-party libraries used in this r
 1. [React Native CallKeep](https://www.npmjs.com/package/react-native-callkeep)
 2. [React Native VoIP Push Notification](https://www.npmjs.com/package/react-native-voip-push-notification)
 3. [VideoSDK RN Android Overlay Permission](https://www.npmjs.com/package/videosdk-rn-android-overlay-permission)
+4. [React Native Firebase - Messaging](https://rnfirebase.io/messaging/usage)
+5. [React Native Firebase - Firestore](https://rnfirebase.io/firestore/usage)
 
 ## Client
 
