@@ -140,6 +140,7 @@ Click on `All calling accounts` and allow the app to receive call.
 <p float="left">
   <img src="./public/ot-4.png" width="180" />
 </p>
+
 _**NOTE : It is necesary to setup local server before run the project.**_
 
 ## Server Setup
