@@ -54,7 +54,7 @@ REACT_APP_VIDEOSDK_TOKEN = "TEMPORARY-TOKEN";
 
 Please follow the guidance of [iOS setup](./iOS_SETUP.md)
 
-### Step 1: Install packages and install pods
+### Step 1: Install packages and pods
 
 ```js
 npm install
