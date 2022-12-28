@@ -107,11 +107,6 @@ For an app to handle calls in a dead or background state, both permissions are r
 
 ![plot](./public/xiomi-1.png)
 
-<!-- <p float="left">
-  <img src="./public/xiomi-1.png" width="200" />
-  <img src="./public/xiomi-1.png" width="200" /> 
-</p> -->
-
 #### Other device
 
 ![plot](./public/ot-1.png)
