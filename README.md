@@ -105,30 +105,41 @@ For an app to handle calls in a dead or background state, both permissions are r
 
 #### Xiomi device
 
-![plot](./public/xiomi-1.png)
+<p float="left">
+  <img src="./public/xiomi-1.png" width="180"  />
+</p>
 
 #### Other device
 
-![plot](./public/ot-1.png)
+<p float="left">
+  <img src="./public/ot-1.png" width="180" />
+</p>
 
 ### 2. Access phone accounts permission
 
-![plot](./public/ot-2.png)
+<p float="left">
+  <img src="./public/ot-2.png" width="180" />
+</p>
 
 Now, different device have different ways to allow call account permissions.
 
 #### Xiomi device
 
-![plot](./public/xiomi-2.png)
+<p float="left">
+  <img src="./public/xiomi-2.png" width="180" />
+</p>
 
 #### Other device
 
-![plot](./public/ot-3.png)
+<p float="left">
+  <img src="./public/ot-3.png" width="180" />
+</p>
 
 Click on `All calling accounts` and allow the app to receive call.
 
-![plot](./public/ot-4.png)
-
+<p float="left">
+  <img src="./public/ot-4.png" width="180" />
+</p>
 _**NOTE : It is necesary to setup local server before run the project.**_
 
 ## Server Setup
@@ -174,4 +185,3 @@ You can generate the issue on [Github](https://github.com/videosdk-live/videosdk
 - Xiomi
 - Realme
 - Oppo
-
