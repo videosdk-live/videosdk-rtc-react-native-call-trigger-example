@@ -175,7 +175,3 @@ You can generate the issue on [Github](https://github.com/videosdk-live/videosdk
 - Realme
 - Oppo
 
-### Upcoming Feature
-
-- Recieves call when app is background
-- Recieves call when lock screen - _COMING SOON_
