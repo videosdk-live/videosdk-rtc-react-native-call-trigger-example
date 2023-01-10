@@ -1,5 +1,5 @@
 {
   "projects": {
-    "default": "videosdk-callkit"
+    "default": "react-native-callkit"
   }
 }

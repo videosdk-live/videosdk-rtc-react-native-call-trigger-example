@@ -2,7 +2,7 @@ const API_BASE_URL = "https://api.videosdk.live/v2";
 const VIDEOSDK_TOKEN = process.env.REACT_APP_VIDEOSDK_TOKEN;
 
 const FCM_SERVER_URL =
-  "https://us-central1-videosdk-callkit.cloudfunctions.net/app";
+  "https://us-central1-react-native-callkit.cloudfunctions.net/app";
 
 export const getToken = () => {
   return VIDEOSDK_TOKEN;

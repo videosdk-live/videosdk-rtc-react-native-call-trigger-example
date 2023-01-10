@@ -12,17 +12,11 @@
     }
   ],
   "hosting": {
-    "public": "y",
+    "public": "n",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
     ]
   }
 }
