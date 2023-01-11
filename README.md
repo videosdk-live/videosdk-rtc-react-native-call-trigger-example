@@ -4,8 +4,7 @@
 
 📲 Download the Sample iOS app here: _COMING SOON_
 
-📱 Download the Sample Android app here: https://appdistribution.firebase.google.com/pub/i/4dc3b7d23902052c
-
+📱 Download the Sample Android app here: https://appdistribution.firebase.dev/i/e977b56536d45796
 <br/>
 
 Before continuing, let's keep an eye on the third-party libraries used in this repository.
